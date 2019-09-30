@@ -1,0 +1,119 @@
+首先要认清https中双向认证的原理，此处可百度获知；重点理清在https双向认证中需要用法的证书与公钥私钥。
+
+-----------------------------------------------------------------------------------------------------------------
+最后需要用到的证书与私钥：
+                        服务器端使用：server.crt(根据ca证书颁发的)
+                                     server.key(根据openssl生成的私钥)
+                        客户端(浏览器)使用：ca.crt(根据openssl生成的自己的ca机构证书)
+                                           client.crt或client.p12或其他(首先ca证书签发client.crt证书，因为需要导入浏览器进行，浏览器对证书的格式有要求
+                                           本次我使用的是chrome浏览器，支持pkcs12即.pfx格式，由client.crt->client.p12)
+
+-----------------------------------------------------------------------------------------------------------------                                           
+浏览器证书导入：1、打开浏览器把ca的证书（ca.crt）导入浏览器。
+               2、双击client.p12将其导入浏览器。
+ 
+-----------------------------------------------------------------------------------------------------------------              
+配置成功现象：浏览器输入URL后，有弹窗提示使用证书，选定后会成功跳转到服务器首页。（注意：使用chrome浏览器时因为浏览器本身对自定义的ca证书默认不信任，所以会有警报，
+              只要能够进入服务器首页就是成功了，不放心的可以使用IE浏览器进行验证，IE不会对自定义的CA证书进行警告）。
+              
+             
+-----------------------------------------------------------------------------------------------------------------
+下面是openssl生成密钥与各个证书的步骤：
+
+-----------------------------------------------------------------------------------------------------------------
+一，首先切换到apache目录下，创建一个CA文件夹
+
+sudo mkdir CA
+
+sudo chmod 777 CA
+
+二，然后进去CA文件夹
+
+cp CA
+
+三，创建其它文件
+
+mkdir demoCA
+
+mkdir demoCA/newcerts
+
+mkdir demoCA/private
+
+touch demoCA/index.txt
+
+echo "01" >> demoCA/serial
+
+四，输入“openssl genrsa -out server.key 1024”，生成网站服务器公钥文件server.key。
+
+     输入openssl req -new -out server.csr -key server.key （Common
+Name为要申请域名证书的域名）
+
+     输入“openssl genrsa -out ca.key 1024”，生成CA私钥文件ca.key。
+
+ 
+   输入“openssl req -new -x509 -days 365 -key ca.key -out ca.crt ”，生成CA证书。
+
+输入“openssl ca
+
+ -in server.csr -out server.crt -cert ca.crt -keyfile ca.key”，
+
+之后会在bin目录下面看到多了一个server.crt文件，
+
+这就是签名以后的服务器证书。
+
+打开浏览器把ca的证书（ca.crt）导入浏览器。
+
+五，生成
+
+ client.key 
+
+openssl
+
+ genrsa -out client.key 1024
+
+生成客户证书
+
+ client.crt
+
+
+openssl req -new -key client.key -out client.csr
+
+将client.crt转换为 .pfx 格式的证书
+
+openssl x509 -req -days 365 -CA ca.crt -CAkey ca.key -CAcreateserial -in client.csr -out client.crt
+
+将client.crt转换为 .pfx 格式的证书
+
+openssl pkcs12 -export -clcerts -in client.crt -inkey client.key -out client.p12
+
+双击client.p12将其导入浏览器。
+
+
+-----------------------------------------------------------------------------------------------------------------
+最后需要配置服务器：
+
+六，配置httpd.conf
+
+这里的httpd.conf不一定每个人的文件都是这个，我本次修改的配置文件时/etc/apache2/site-available/default-ssl.conf
+
+LoadModule
+
+ ssl_module modules/mod_ssl.so 
+
+<VirtualHost _default_:443>
+        ServerAdmin crm.xiaolong.com
+
+        DocumentRoot /var/www
+
+        LogLevel warn
+        ErrorLog /var/log/apache2/error.log
+        CustomLog /var/log/apache2/ssl_access.log combined
+        SSLEngine on
+        SSLCertificateFile    /etc/apache2/CA/server.crt
+        SSLCertificateKeyFile /etc/apache2/CA/server.key
+SSLCACertificateFile /etc/apache2/CA/ca.crt
+
+SSLVerifyClient require
+SSLVerifyDepth 10
+</VirtualHost>
+-----------------------------------------------------------------------------------------------------------------
