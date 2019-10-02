@@ -1,0 +1,16 @@
+前言：在默认编译的情况下，Libcurl是不支持ssl的，即无法访问https的url，所以我重新编译了一版支持ssl的libcurl。
+
+x86:
+    1、./configure --prefix=你的安装路径 --with-ssl=编译出来的openssl的主目录（--with-ssl即是打开ssl配置的选项）
+    2、sudo make
+    3、sudo make install
+    4、cp libcurl.so.4.6 /usr/lib/x86_64-linux-gnu/ （把库拷贝到编译器的路径下）
+    6、rm /usr/bin/curl（如果没有把本来系统自带的curl删掉的话就使用这个，把本来的bin删掉）
+    7、ln -s 安装路径/bin/curl /usr/bin/curl（软连接到刚才编译出来，属于你自己版本的curl的bin）
+    8、curl -V（然后在任意目录输入这个可以显示版本的话即表示编译成功并可以运行）
+
+
+
+
+arm:(还未编译，x86版本功能验证后再编译此版本)
+    参考：https://blog.csdn.net/king_jie0210/article/details/82897759
