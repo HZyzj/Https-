@@ -1,0 +1,21 @@
+由于编译支持https的libcurl时需要openssl的头文件与库，故自己重新编译了一份openssl的库（为什么不用系统自带的在Libcurl编译笔记中会提及）
+
+x86：
+    1、首先去百度下载openssl的源码包：http://distfiles.macports.org/openssl/ 
+        下载的版本最好查看lincurl源码的configure查看支持的版本。这次我使用的是1.1.1d版本的。
+    2、解压到目录下后，cd进入主目录
+    3、使用的是config这个文件进行配置（不是configure）
+    4、执行 ./config shared --prefix=你的文件路径（编译x86版本的无需过多参数）
+    5、sudo make
+    6、sudo make install
+    7、cp libcrypto.so.1.1 /usr/lib/x86_64-linux-gnu/ （把库拷贝到编译器的路径下）
+    8、cp libssl.so.1.1 /usr/lib/x86_64-linux-gnu/
+    9、rm /usr/bin/openss（如果没有把本来系统自带的openssl删掉的话就使用这个，把本来的bin删掉）
+    10、ln -s /usr/local/bin/openssl /usr/bin/openssl（软连接到刚才编译出来，属于你自己版本的openssl的bin）
+    11、openssl version（然后在任意目录输入这个可以显示版本的话即表示编译成功并可以运行）
+
+
+
+
+
+arm：（现在还没编译，成功了再回来写）
