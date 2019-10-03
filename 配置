@@ -116,4 +116,14 @@ SSLCACertificateFile /etc/apache2/CA/ca.crt
 SSLVerifyClient require
 SSLVerifyDepth 10
 </VirtualHost>
------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------
+
+环境配置：
+      由于在服务器需要执行php文件，所以需要配置一个环境让服务器可以解析php文件
+      1、执行：sudo apt-get install libapache2-mod-php7.0 
+      2、service apache2 restart
+
+
+
+
+
