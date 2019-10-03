@@ -123,6 +123,22 @@ SSLVerifyDepth 10
       1、执行：sudo apt-get install libapache2-mod-php7.0 
       2、service apache2 restart
 
+-----------------------------------------------------------------------------------------------------------------
+环境配置：
+      由于使用的是https，所以需要把SSL模块加载。
+      
+      三、开启SSL模块
+      $sudo a2enmod ssl
+
+      这条命令相当于
+      sudo ln -s /etc/apache2/mods-available/ssl.load /etc/apache2/mods-enabled
+      sudo ln -s /etc/apache2/mods-available/ssl.conf /etc/apache2/mods-enabled
+
+      如果没有a2enmod指令，也可直接在apache2.conf中设置SSL模块加载：
+
+      LoadModule ssl_module /usr/lib/apache2/modules/mod_ssl.so
+
+
 
 
 
