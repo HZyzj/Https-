@@ -1,0 +1,27 @@
+目前接触的nginx配置仅限下载回来直接运行的http服务器，未添加过多的协议。
+工作中刚好需要使用在nginx下运行一个php脚本，但是一开始发现服务器无法解析php与js。
+由于只会php就把尝试着把服务器的php解析打开。步骤如下：
+
+1、sudo apt-get install php7.0-fpm （环境内需要有php的解析器）
+2、vim /etc/nginx/sites-enabled/default 编辑里面的内容
+
+找到下面的内容：	
+
+location ~ \.php$ {
+		
+		include snippets/fastcgi-php.conf;
+		# With php-fpm (or other unix sockets):
+		fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+		# With php-cgi (or other tcp sockets):
+		#fastcgi_pass 127.0.0.1:9000;
+	}
+还没有被配置的时候花括号的内容都是被注释的，现在你需要做的是要把句子前面的#去掉。
+
+需要注意的是	fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;  这两行只能打开一条，不然服务器会因配置出错而无法启动。
+		        #fastcgi_pass 127.0.0.1:9000;
+一般情况下打开第一条，第二条127.0.0.1应该是打开内网的访问解析（未验证）。
+
+
+3、修改完之后保存退出，sudo service nginx restart重启服务器
+
+4、正常使用。
